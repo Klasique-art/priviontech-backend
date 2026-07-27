@@ -17,12 +17,11 @@ Give exact provider-specific configuration, build/start/migration commands, DNS 
 - Language: TypeScript.
 - Package manager: npm with committed `package-lock.json`.
 - Main API stack: Express 5, Prisma 6, PostgreSQL, Zod.
-- The repository also contains a small Next.js 15 application.
-- `src/server.ts` starts Next and mounts the Express application before the Next request handler.
+- `src/server.ts` starts the Express application directly.
 - This is a long-running Node HTTP server, not a collection of serverless functions.
 - The process binds to `HOST`, normally `0.0.0.0`.
 - Local backend port is `8000`, but a hosting platform may inject a different `PORT`; its value must be honored.
-- Production command runs `tsx src/server.ts`; `tsx` is currently a development dependency. The host must install dev dependencies, or the deployment configuration/package layout must be adjusted.
+- Production command runs `tsx src/server.ts`; `tsx` is a production dependency.
 - The application sets Express `trust proxy` to `1`, which is appropriate behind one managed reverse proxy.
 
 ## Important paths
@@ -237,7 +236,7 @@ The project has recently passed:
 - TypeScript checking.
 - ESLint.
 - 13 Vitest API tests.
-- Next.js production build.
+- Express/Prisma production build from a clean `npm ci` install.
 - Admin Vite production build.
 - Prisma migrations and seed against local PostgreSQL.
 - Cloudinary credential ping.

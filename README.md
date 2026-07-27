@@ -1,6 +1,6 @@
 # Privion Technologies platform
 
-Production-oriented Express/TypeScript REST API with PostgreSQL/Prisma, a Next.js public shell, and a separate Vite/React admin panel.
+Production-oriented Express/TypeScript REST API with PostgreSQL/Prisma and a separate Vite/React admin panel.
 
 ## Local development
 
