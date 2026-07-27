@@ -6,7 +6,7 @@ export type ApiResponse<T> = {
 
 const apiOrigin = (
   import.meta.env.VITE_API_BASE_URL ??
-  (import.meta.env.PROD ? "https://priviontech-api.onrender.com" : "")
+  (import.meta.env.PROD ? "https://api.priviontechnology.com" : "")
 ).replace(/\/+$/, "");
 
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
