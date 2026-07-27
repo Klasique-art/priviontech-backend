@@ -32,6 +32,6 @@ Admin: `http://localhost:5173`. Use the `ADMIN_EMAIL` and `ADMIN_PASSWORD` value
 
 ## Deployment
 
-Supply all `.env.example` variables through the deployment secret manager. Use a strong random 32+ character JWT secret, HTTPS, an exact admin CORS origin, and a managed PostgreSQL database. Run `npx prisma migrate deploy` before starting the application, then `npm run build && npm start`. Build and host `admin/dist` behind HTTPS on the configured origin. Back up PostgreSQL and rotate administrator credentials.
+Supply all `.env.example` variables through the deployment secret manager. Use a strong random 32+ character JWT secret, HTTPS, an exact admin CORS origin, and a managed PostgreSQL database. Never deploy with the local Docker database URL (`localhost`/`127.0.0.1:5433`); use the provider's private/internal connection string. Run `npx prisma migrate deploy` before starting the application, then `npm run build && npm start`. For Render, the checked-in `render.yaml` provisions PostgreSQL and wires `DATABASE_URL` automatically. Build and host `admin/dist` behind HTTPS on the configured origin. Back up PostgreSQL and rotate administrator credentials.
 
 See [API documentation](docs/API.md) and [admin guide](docs/ADMIN.md).

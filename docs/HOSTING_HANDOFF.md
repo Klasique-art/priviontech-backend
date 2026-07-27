@@ -68,6 +68,24 @@ npm start
 
 The seed command is idempotent, but it also creates/updates the configured administrator and demo services/projects. Run it intentionally, normally once for a new environment. It reads `ADMIN_NAME`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD`.
 
+### Render deployment
+
+The repository includes `render.yaml`. Creating a Render Blueprint from the repository provisions both the Node web service and a Render PostgreSQL database. It injects the database's private `connectionString` as `DATABASE_URL`, runs checked-in Prisma migrations during the build, starts the API, and monitors `/api/v1/health`.
+
+The Blueprint uses the free web-service plan, where Render does not provide a pre-deploy command. Consequently, `npx prisma migrate deploy` is the final build step. If the service is upgraded to a paid plan, move migrations to Render's pre-deploy command and use `npm ci && npm run build` as the build command.
+
+For an existing manually configured Render service:
+
+1. Create a Render Postgres database in the same region.
+2. Copy its **Internal Database URL**.
+3. Replace the web service's `DATABASE_URL` environment variable with that URL.
+4. Never use `localhost`, `127.0.0.1`, port `5433`, or the local Docker credentials on Render.
+5. Set the build command to `npm ci && npm run build && npx prisma migrate deploy`.
+6. Set the start command to `npm start`.
+7. Trigger **Manual Deploy → Clear build cache & deploy**.
+
+The local `127.0.0.1:5433` URL works only when the API is running on the same computer as the Docker Compose PostgreSQL container. On Render, loopback points back to the isolated Render build/service instance, where no PostgreSQL server exists.
+
 ## Database
 
 - Provider: PostgreSQL.
