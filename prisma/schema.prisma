@@ -1,0 +1,202 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AdminRole {
+  ADMIN
+  EDITOR
+}
+
+enum ProjectStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum EnquiryStatus {
+  NEW
+  IN_PROGRESS
+  RESOLVED
+  SPAM
+}
+
+enum RequestStatus {
+  NEW
+  REVIEWING
+  CONTACTED
+  ACCEPTED
+  DECLINED
+  SPAM
+}
+
+enum ProjectKind {
+  WEBSITE
+  WEB_APP
+  MOBILE_APP
+  DESKTOP_APP
+  PLATFORM
+  CASE_STUDY
+}
+
+model Admin {
+  id           String    @id @default(uuid()) @db.Uuid
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         AdminRole @default(EDITOR)
+  isActive     Boolean   @default(true)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Service {
+  id                String                  @id @default(uuid()) @db.Uuid
+  title             String
+  slug              String                  @unique
+  shortDescription  String
+  description       String
+  tagline           String?
+  category          String?
+  icon              String?
+  imageUrl          String?
+  heroImageUrl      String?
+  features          String[]                @default([])
+  benefits          String[]                @default([])
+  deliverables      String[]                @default([])
+  technologies      String[]                @default([])
+  process           Json?
+  faqs              Json?
+  startingPrice     String?
+  estimatedTimeline String?
+  order             Int                     @default(0)
+  isActive          Boolean                 @default(true)
+  isArchived        Boolean                 @default(false)
+  seoTitle          String?
+  seoDescription    String?
+  projects          ProjectService[]
+  requests          ProjectRequestService[]
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+
+  @@index([isActive, order])
+  @@index([category])
+}
+
+model Project {
+  id             String           @id @default(uuid()) @db.Uuid
+  title          String
+  slug           String           @unique
+  clientName     String?
+  summary        String
+  content        String
+  kind           ProjectKind      @default(CASE_STUDY)
+  coverImageUrl  String?
+  galleryImages  String[]         @default([])
+  screenshots    String[]         @default([])
+  technologies   String[]         @default([])
+  platforms      String[]         @default([])
+  features       String[]         @default([])
+  projectUrl     String?
+  playStoreUrl   String?
+  appStoreUrl    String?
+  results        Json?
+  completionDate DateTime?
+  order          Int              @default(0)
+  status         ProjectStatus    @default(DRAFT)
+  isFeatured     Boolean          @default(false)
+  seoTitle       String?
+  seoDescription String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  publishedAt    DateTime?
+  services       ProjectService[]
+
+  @@index([status, order])
+  @@index([status, kind])
+}
+
+model ProjectService {
+  projectId String  @db.Uuid
+  serviceId String  @db.Uuid
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+
+  @@id([projectId, serviceId])
+}
+
+model Enquiry {
+  id         String        @id @default(uuid()) @db.Uuid
+  name       String
+  email      String
+  phone      String?
+  company    String?
+  subject    String
+  message    String
+  status     EnquiryStatus @default(NEW)
+  adminNotes String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([status, createdAt])
+}
+
+model ProjectRequest {
+  id                 String                  @id @default(uuid()) @db.Uuid
+  name               String
+  email              String
+  phone              String?
+  company            String?
+  projectType        String?
+  projectSummary     String
+  goals              String[]                @default([])
+  targetAudience     String?
+  requiredFeatures   String[]                @default([])
+  preferredPlatforms String[]                @default([])
+  inspirationUrls    String[]                @default([])
+  budgetRange        String?
+  budgetMin          Int?
+  budgetMax          Int?
+  budgetCurrency     String?
+  desiredStartDate   DateTime?
+  timeline           String?
+  attachmentUrl      String?
+  attachmentUrls     String[]                @default([])
+  contactPreference  String?
+  discoveryAnswers   Json?
+  consentToContact   Boolean                 @default(false)
+  source             String?
+  status             RequestStatus           @default(NEW)
+  adminNotes         String?
+  services           ProjectRequestService[]
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
+
+  @@index([status, createdAt])
+}
+
+model ProjectRequestService {
+  projectRequestId String         @db.Uuid
+  serviceId        String         @db.Uuid
+  projectRequest   ProjectRequest @relation(fields: [projectRequestId], references: [id], onDelete: Cascade)
+  service          Service        @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+
+  @@id([projectRequestId, serviceId])
+}
+
+model SiteSettings {
+  id                    Int      @id @default(1)
+  companyName           String
+  contactEmail          String
+  contactPhone          String?
+  address               String?
+  linkedInUrl           String?
+  defaultSeoTitle       String
+  defaultSeoDescription String
+  updatedAt             DateTime @updatedAt
+}
